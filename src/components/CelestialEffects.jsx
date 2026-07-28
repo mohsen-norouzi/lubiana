@@ -224,7 +224,7 @@ export default function CelestialEffects({ playing = false }) {
     })
   }, [playing])
 
-  // Logo entrance + slow spin
+  // Logo + main star entrance / glow pulse
   useEffect(() => {
     const ctx = gsap.context(() => {
       gsap.fromTo(
@@ -244,6 +244,21 @@ export default function CelestialEffects({ playing = false }) {
         ease: 'none',
         repeat: -1,
         delay: 1.2,
+      })
+
+      gsap.fromTo(
+        '[data-anim="main-star"]',
+        { scale: 0.4, opacity: 0 },
+        { scale: 1, opacity: 0.55, duration: 1.1, delay: 0.7, ease: 'power2.out' },
+      )
+
+      gsap.to('[data-anim="main-star"]', {
+        scale: 1.05,
+        duration: 2.4,
+        ease: 'sine.inOut',
+        repeat: -1,
+        yoyo: true,
+        delay: 1.8,
       })
     }, layerRef)
     return () => ctx.revert()
@@ -300,6 +315,13 @@ export default function CelestialEffects({ playing = false }) {
           </span>
         )
       })}
+
+      <img
+        data-anim="main-star"
+        src="/img/main-star.png"
+        alt=""
+        className="main-star absolute top-[46%] left-[40%] z-[2] h-16 w-16 -translate-x-1/2 -translate-y-1/2 object-contain sm:h-20 sm:w-20 md:left-[42%] md:h-24 md:w-24"
+      />
 
       <img
         data-anim="logo-sun"
