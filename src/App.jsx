@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
-import heroScene from './assets/hero-composite.jpg'
 import albumArt from './assets/album-beloved.jpg'
 
 const NAV = ['Music', 'Live', 'Videos', 'About', 'Journal', 'Contact']
@@ -64,7 +63,7 @@ const STARS = generateStars(48)
 
 export default function App() {
   const rootRef = useRef(null)
-  const sceneRef = useRef(null)
+  const artistRef = useRef(null)
   const orbitRef = useRef(null)
 
   useEffect(() => {
@@ -103,26 +102,11 @@ export default function App() {
           '-=0.4',
         )
 
-      gsap.fromTo(
-        sceneRef.current,
-        { scale: 1.08, xPercent: 2 },
-        {
-          scale: 1,
-          xPercent: 0,
-          duration: 4.5,
-          ease: 'power2.out',
-        },
-      )
-
-      // Subtle ongoing Ken Burns
-      gsap.to(sceneRef.current, {
-        scale: 1.05,
-        xPercent: -1.5,
-        duration: 28,
-        ease: 'none',
-        repeat: -1,
-        yoyo: true,
-        delay: 4.5,
+      gsap.from(artistRef.current, {
+        opacity: 0,
+        duration: 1.4,
+        ease: 'power2.out',
+        delay: 0.15,
       })
 
       // Twinkling stars
@@ -161,15 +145,6 @@ export default function App() {
         })
       }
 
-      // Soft cloud drift via CSS filter layer
-      gsap.to('[data-anim="cloud-wash"]', {
-        xPercent: 4,
-        duration: 22,
-        ease: 'sine.inOut',
-        repeat: -1,
-        yoyo: true,
-      })
-
       // Star icon pulse
       gsap.to('[data-twinkle]', {
         opacity: 0.35,
@@ -188,42 +163,16 @@ export default function App() {
   return (
     <section
       ref={rootRef}
-      className="relative min-h-svh w-full overflow-hidden bg-night-deep text-cream"
+      className="relative min-h-svh w-full overflow-hidden bg-transparent text-cream"
     >
-      {/* Background scene */}
-      <div className="pointer-events-none absolute inset-0">
+      {/* girl.png as-is */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <img
-          ref={sceneRef}
-          src={heroScene}
-          alt=""
-          className="absolute inset-0 h-full w-full origin-right object-cover object-[72%_center] will-change-transform"
+          ref={artistRef}
+          src="/img/girl.png"
+          alt="Lubiana with kora"
+          className="absolute inset-0 h-full w-full object-cover object-center"
         />
-
-        {/* Left readability wash */}
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              'linear-gradient(90deg, #040d18e6 0%, #071525b3 32%, #07152555 48%, transparent 64%)',
-          }}
-        />
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              'linear-gradient(180deg, #040d18b3 0%, transparent 16%, transparent 82%, #040d18cc 100%)',
-          }}
-        />
-        <div
-          data-anim="cloud-wash"
-          className="absolute inset-y-[42%] left-0 w-[55%] opacity-40"
-          style={{
-            background:
-              'radial-gradient(ellipse at 30% 70%, rgba(210,200,185,0.22) 0%, transparent 55%)',
-          }}
-        />
-        {/* Film grain */}
-        <div className="text-grain absolute inset-0 opacity-[0.18] mix-blend-overlay" />
       </div>
 
       {/* Star field */}
