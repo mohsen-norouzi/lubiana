@@ -391,32 +391,33 @@ export default function App() {
 
         <audio ref={audioRef} src="/sample.mp3" preload="auto" />
 
-        <div data-anim="tour" className="flex items-end gap-4 sm:gap-5">
-          <div className="relative shrink-0">
-            <div
-              className="absolute -right-2 -top-1 h-[4.5rem] w-[4.5rem] rounded-full border border-cream/15 bg-gradient-to-br from-[#2a3340] to-[#121820] sm:h-[5rem] sm:w-[5rem]"
-              aria-hidden="true"
-            />
-            <img
-              src="/img/cover.png"
-              alt="Beloved album cover"
-              className="relative h-[4.5rem] w-[4.5rem] object-cover shadow-[0_8px_24px_rgba(0,0,0,0.45)] sm:h-[5rem] sm:w-[5rem]"
-            />
-          </div>
-          <div className="pb-0.5">
-            <div className="mb-1.5 flex items-center gap-2 text-gold">
-              <span data-twinkle>
-                <StarIcon className="h-2.5 w-2.5" />
+        <div
+          data-anim="tour"
+          className="flex items-center gap-5 sm:gap-6"
+        >
+          <img
+            src="/img/cover.png"
+            alt="Lubiana Beloved — album cover"
+            className="h-[5.5rem] w-auto max-w-[9.5rem] shrink-0 object-contain drop-shadow-[0_10px_28px_rgba(0,0,0,0.55)] sm:h-[6.5rem] sm:max-w-[11rem]"
+          />
+
+          <div className="min-w-0">
+            <div className="mb-1.5 flex items-start gap-2.5 sm:gap-3">
+              <span data-twinkle className="mt-1.5 shrink-0 text-gold">
+                <EightPointStar className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               </span>
-              <p className="text-[12px] font-light tracking-[0.04em]">
-                European Tour 26{' '}
-                <span className="text-gold/50">/</span>{' '}
-                <span className="text-gold-soft">Tickets on sale now</span>
-              </p>
+              <div>
+                <p className="font-display text-[1.35rem] leading-[1.15] font-medium tracking-[0.02em] text-cream sm:text-[1.65rem]">
+                  European Tour 26
+                </p>
+                <p className="mt-1 text-[12px] font-light tracking-[0.02em] text-gold sm:text-[13px]">
+                  Tickets on sale now
+                </p>
+              </div>
             </div>
             <a
               href="#tour"
-              className="text-[11px] font-light tracking-[0.28em] text-cream/90 uppercase underline decoration-cream/40 underline-offset-4 transition-colors hover:text-gold hover:decoration-gold"
+              className="mt-2 ml-[1.4rem] inline-block text-[11px] font-light tracking-[0.28em] text-cream uppercase underline decoration-cream/50 underline-offset-[5px] transition-colors hover:text-gold hover:decoration-gold sm:ml-[1.65rem]"
             >
               See Dates
             </a>
