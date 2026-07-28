@@ -29,7 +29,6 @@ const LINK = {
   opacity: 0.1,
   width: 0.7,
   color: '#e8e2d8',
-  seed: 7,
 }
 
 function buildStars(count, topPercent) {
@@ -54,38 +53,32 @@ function buildStars(count, topPercent) {
   })
 }
 
-function buildLinks(stars, { count, maxDist, seed }) {
-  const rand = seededRandom(seed)
-  const links = []
-  const used = new Set()
-  const maxAttempts = count * 40
-  let attempts = 0
-
-  while (links.length < count && attempts < maxAttempts) {
-    attempts += 1
-    const a = Math.floor(rand() * stars.length)
-    let b = Math.floor(rand() * stars.length)
+function pickRandomPair(stars, maxDist) {
+  const maxAttempts = 40
+  for (let n = 0; n < maxAttempts; n++) {
+    const a = Math.floor(Math.random() * stars.length)
+    let b = Math.floor(Math.random() * stars.length)
     if (a === b) continue
-
-    const key = a < b ? `${a}-${b}` : `${b}-${a}`
-    if (used.has(key)) continue
-
     const dx = stars[a].x - stars[b].x
     const dy = stars[a].y - stars[b].y
     const dist = Math.hypot(dx, dy)
     if (dist > maxDist || dist < 2) continue
-
-    used.add(key)
-    links.push({
-      id: key,
+    return {
       x1: stars[a].x,
       y1: stars[a].y,
       x2: stars[b].x,
       y2: stars[b].y,
-    })
+    }
   }
-
-  return links
+  // fallback: any two distinct stars
+  const a = Math.floor(Math.random() * stars.length)
+  let b = (a + 1 + Math.floor(Math.random() * (stars.length - 1))) % stars.length
+  return {
+    x1: stars[a].x,
+    y1: stars[a].y,
+    x2: stars[b].x,
+    y2: stars[b].y,
+  }
 }
 
 function XStar({ size, glow, color = '#e8e2d8' }) {
@@ -115,21 +108,13 @@ export default function CelestialEffects({ playing = false }) {
   const starTweensRef = useRef([])
   const linkTweensRef = useRef([])
   const playingRef = useRef(playing)
+  const starsRef = useRef([])
 
   const stars = useMemo(
     () => buildStars(STAR.count, STAR.skyCoverage),
     [],
   )
-
-  const links = useMemo(
-    () =>
-      buildLinks(stars, {
-        count: LINK.count,
-        maxDist: LINK.maxDist,
-        seed: LINK.seed,
-      }),
-    [stars],
-  )
+  starsRef.current = stars
 
   playingRef.current = playing
 
@@ -170,52 +155,73 @@ export default function CelestialEffects({ playing = false }) {
     }
   }, [])
 
-  // Constellation lines — stepped appear/disappear with music, matching star frame rate
+  // Random constellation links — new star pairs every blink cycle
   useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.killTweensOf('[data-link]')
+    const stopLinks = () => {
+      linkTweensRef.current.forEach((t) => t.kill())
       linkTweensRef.current = []
+      gsap.set('[data-link]', { opacity: 0 })
+    }
 
+    if (!playing) {
+      stopLinks()
+      return stopLinks
+    }
+
+    const ctx = gsap.context(() => {
+      stopLinks()
       const lines = gsap.utils.toArray('[data-link]')
-      lines.forEach((el, i) => {
+
+      const runCycle = (el, i) => {
+        if (!playingRef.current) {
+          gsap.set(el, { opacity: 0 })
+          return
+        }
+
+        const pair = pickRandomPair(starsRef.current, LINK.maxDist)
         gsap.set(el, {
           opacity: 0,
-          attr: { 'stroke-dashoffset': 0 },
+          attr: { x1: pair.x1, y1: pair.y1, x2: pair.x2, y2: pair.y2 },
         })
 
-        // Low-FPS: snap between invisible ↔ visible like the stars
+        const duration = STAR.animDuration + (i % 3) * 0.08
         const tween = gsap.to(el, {
           opacity: LINK.opacity,
-          duration: STAR.animDuration + (i % 3) * 0.08,
+          duration,
           ease: `steps(${STAR.frameSteps})`,
-          repeat: -1,
           yoyo: true,
-          delay: (i % 11) * STAR.stagger + (i % 5) * 0.12,
-          paused: !playingRef.current,
+          repeat: 1,
+          delay: (i % 7) * 0.15,
+          onComplete() {
+            if (!playingRef.current) {
+              gsap.set(el, { opacity: 0 })
+              return
+            }
+            // brief gap, then reconnect two new random stars
+            const wait = gsap.delayedCall(0.08 + Math.random() * 0.35, () => {
+              runCycle(el, i)
+            })
+            linkTweensRef.current.push(wait)
+          },
         })
         linkTweensRef.current.push(tween)
-      })
+      }
+
+      lines.forEach((el, i) => runCycle(el, i))
     }, layerRef)
 
     return () => {
       ctx.revert()
-      linkTweensRef.current = []
+      stopLinks()
     }
-  }, [links])
+  }, [playing])
 
-  // Pause freezes stars; links vanish when music stops
+  // Pause freezes stars in place
   useEffect(() => {
     starTweensRef.current.forEach((tween) => {
       if (playing) tween.resume()
       else tween.pause()
     })
-
-    if (playing) {
-      linkTweensRef.current.forEach((tween) => tween.resume())
-    } else {
-      linkTweensRef.current.forEach((tween) => tween.pause())
-      gsap.set('[data-link]', { opacity: 0 })
-    }
   }, [playing])
 
   // Logo entrance + slow spin
@@ -251,14 +257,14 @@ export default function CelestialEffects({ playing = false }) {
         preserveAspectRatio="none"
         aria-hidden="true"
       >
-        {links.map((link) => (
+        {Array.from({ length: LINK.count }, (_, i) => (
           <line
-            key={link.id}
+            key={i}
             data-link
-            x1={link.x1}
-            y1={link.y1}
-            x2={link.x2}
-            y2={link.y2}
+            x1={0}
+            y1={0}
+            x2={0}
+            y2={0}
             stroke={LINK.color}
             strokeWidth={LINK.width}
             vectorEffect="non-scaling-stroke"
