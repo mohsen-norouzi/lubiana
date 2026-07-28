@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 import albumArt from './assets/album-beloved.jpg'
+import CelestialEffects from './components/CelestialEffects'
 
 const NAV = ['Music', 'Live', 'Videos', 'About', 'Journal', 'Contact']
 
@@ -48,23 +49,9 @@ function InstagramIcon() {
   )
 }
 
-function generateStars(count) {
-  return Array.from({ length: count }, (_, i) => ({
-    id: i,
-    left: `${(i * 37) % 100}%`,
-    top: `${(i * 53) % 62}%`,
-    size: i % 5 === 0 ? 2.5 : i % 3 === 0 ? 1.8 : 1.2,
-    delay: (i % 10) * 0.35,
-    duration: 1.8 + (i % 5) * 0.4,
-  }))
-}
-
-const STARS = generateStars(48)
-
 export default function App() {
   const rootRef = useRef(null)
   const artistRef = useRef(null)
-  const orbitRef = useRef(null)
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -109,43 +96,6 @@ export default function App() {
         delay: 0.15,
       })
 
-      // Twinkling stars
-      gsap.to('[data-star]', {
-        opacity: 0.15,
-        duration: 1.4,
-        stagger: {
-          each: 0.12,
-          from: 'random',
-          repeat: -1,
-          yoyo: true,
-        },
-        ease: 'sine.inOut',
-      })
-
-      // Orbit path draw
-      const path = orbitRef.current
-      if (path) {
-        const length = path.getTotalLength()
-        gsap.set(path, {
-          strokeDasharray: length,
-          strokeDashoffset: length,
-        })
-        gsap.to(path, {
-          strokeDashoffset: 0,
-          duration: 2.4,
-          ease: 'power2.inOut',
-          delay: 0.6,
-        })
-        gsap.from('[data-anim="sun"]', {
-          scale: 0,
-          opacity: 0,
-          duration: 0.8,
-          delay: 2.6,
-          ease: 'back.out(2)',
-        })
-      }
-
-      // Star icon pulse
       gsap.to('[data-twinkle]', {
         opacity: 0.35,
         scale: 0.85,
@@ -165,61 +115,19 @@ export default function App() {
       ref={rootRef}
       className="relative min-h-svh w-full overflow-hidden bg-transparent text-cream"
     >
-      {/* girl.png as-is */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+      {/* Stars behind */}
+      <CelestialEffects />
+
+      {/* girl.png — normal <img>, untouched file. lighten = black sky lets stars show through */}
+      <div className="pointer-events-none absolute inset-0 z-[1] overflow-hidden">
         <img
           ref={artistRef}
           src="/img/girl.png"
           alt="Lubiana with kora"
-          className="absolute inset-0 h-full w-full object-cover object-center"
+          className="absolute inset-0 h-full w-full object-cover object-center mix-blend-lighten"
         />
       </div>
 
-      {/* Star field */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        {STARS.map((star) => (
-          <span
-            key={star.id}
-            data-star
-            className="absolute rounded-full bg-cream"
-            style={{
-              left: star.left,
-              top: star.top,
-              width: star.size,
-              height: star.size,
-              opacity: 0.55 + (star.id % 4) * 0.1,
-              boxShadow: star.size > 2 ? '0 0 6px rgba(232,226,216,0.55)' : 'none',
-            }}
-          />
-        ))}
-      </div>
-
-      {/* Orbital arc */}
-      <svg
-        className="pointer-events-none absolute inset-0 h-full w-full"
-        viewBox="0 0 1440 900"
-        fill="none"
-        preserveAspectRatio="xMidYMid slice"
-        aria-hidden="true"
-      >
-        <path
-          ref={orbitRef}
-          d="M780 420 C 980 180, 1180 140, 1360 220"
-          stroke="rgba(232,226,216,0.55)"
-          strokeWidth="1.2"
-          strokeDasharray="3 7"
-        />
-        <g data-anim="sun" transform="translate(1352, 214)">
-          <circle r="4" fill="#d4a86a" />
-          <path
-            d="M0 -11 L1.4 -3.2 L9 -3.2 L2.8 1.2 L5.2 8.5 L0 4 L-5.2 8.5 L-2.8 1.2 L-9 -3.2 L-1.4 -3.2 Z"
-            fill="#d4a86a"
-            opacity="0.9"
-          />
-        </g>
-      </svg>
-
-      {/* Header */}
       <header
         data-anim="nav"
         className="relative z-20 flex items-center justify-between px-6 pt-6 md:px-10 lg:px-14 lg:pt-8"
@@ -267,7 +175,6 @@ export default function App() {
         </div>
       </header>
 
-      {/* Hero content */}
       <div className="relative z-20 flex min-h-[calc(100svh-5.5rem)] flex-col justify-center px-6 pb-24 pt-10 md:px-10 lg:max-w-[52%] lg:px-14 lg:pb-28 lg:pt-6 xl:max-w-[48%]">
         <div data-anim="eyebrow" className="mb-4 flex items-center gap-2.5 text-gold">
           <span data-twinkle>
@@ -328,7 +235,6 @@ export default function App() {
           </a>
         </div>
 
-        {/* Tour strip */}
         <div data-anim="tour" className="flex items-end gap-4 sm:gap-5">
           <div className="relative shrink-0">
             <div
