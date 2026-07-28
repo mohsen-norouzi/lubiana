@@ -118,34 +118,46 @@ export default function CelestialEffects({ playing = false }) {
 
   playingRef.current = playing
 
-  // Star jumpy animation — hard-coded look
+  // Stars fade in randomly, then twinkle while playing
   useEffect(() => {
     const ctx = gsap.context(() => {
       gsap.killTweensOf('[data-star]')
       starTweensRef.current = []
 
-      const twinklers = gsap.utils.toArray('[data-star][data-twinkle="true"]')
-      twinklers.forEach((el, i) => {
-        const dir = i % 2 === 0 ? 1 : -1
+      const allStars = gsap.utils.toArray('[data-star]')
+      allStars.forEach((el, i) => {
         const base = Number(el.dataset.baseOpacity || 0.6)
+        const dir = i % 2 === 0 ? 1 : -1
+
         gsap.set(el, {
           transformOrigin: '50% 50%',
-          opacity: base,
-          scale: 1,
+          opacity: 0,
+          scale: 0,
           rotation: 0,
         })
-        const tween = gsap.to(el, {
-          opacity: 0,
-          scale: STAR.minScale,
-          rotation: STAR.spinAmount * dir,
-          duration: STAR.animDuration + (i % 3) * 0.08,
-          ease: `steps(${STAR.frameSteps})`,
-          repeat: -1,
-          yoyo: true,
-          delay: (i % 11) * STAR.stagger,
-          paused: !playingRef.current,
+
+        gsap.to(el, {
+          opacity: base,
+          scale: 1,
+          duration: 0.3 + Math.random() * 0.5,
+          delay: 0.15 + Math.random() * 2.2,
+          ease: 'power2.out',
+          onComplete() {
+            if (el.dataset.twinkle !== 'true') return
+            const tween = gsap.to(el, {
+              opacity: 0,
+              scale: STAR.minScale,
+              rotation: STAR.spinAmount * dir,
+              duration: STAR.animDuration + (i % 3) * 0.08,
+              ease: `steps(${STAR.frameSteps})`,
+              repeat: -1,
+              yoyo: true,
+              delay: Math.random() * STAR.stagger * 4,
+              paused: !playingRef.current,
+            })
+            starTweensRef.current.push(tween)
+          },
         })
-        starTweensRef.current.push(tween)
       })
     }, layerRef)
 
@@ -305,7 +317,7 @@ export default function CelestialEffects({ playing = false }) {
               height: s,
               marginLeft: -s / 2,
               marginTop: -s / 2,
-              opacity: star.baseOpacity * STAR.opacity,
+              opacity: 0,
               willChange: 'opacity, transform',
             }}
           >
