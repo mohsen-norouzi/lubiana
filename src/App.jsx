@@ -1,6 +1,5 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import gsap from 'gsap'
-import albumArt from './assets/album-beloved.jpg'
 import CelestialEffects from './components/CelestialEffects'
 
 const NAV = ['Music', 'Live', 'Videos', 'About', 'Journal', 'Contact']
@@ -49,11 +48,73 @@ function InstagramIcon() {
   )
 }
 
+function PlayPauseIcon({ playing }) {
+  return (
+    <span className="relative block h-3 w-3 shrink-0">
+      {/* Fixed box so play ↔ pause never shifts size */}
+      <svg
+        className={`absolute inset-0 h-3 w-3 transition-opacity duration-150 ${playing ? 'opacity-0' : 'opacity-100'}`}
+        viewBox="0 0 12 12"
+        fill="currentColor"
+        aria-hidden="true"
+      >
+        <path d="M3.2 1.6v8.8l7.2-4.4-7.2-4.4z" />
+      </svg>
+      <svg
+        className={`absolute inset-0 h-3 w-3 transition-opacity duration-150 ${playing ? 'opacity-100' : 'opacity-0'}`}
+        viewBox="0 0 12 12"
+        fill="currentColor"
+        aria-hidden="true"
+      >
+        <rect x="2.5" y="2" width="2.4" height="8" rx="0.4" />
+        <rect x="7.1" y="2" width="2.4" height="8" rx="0.4" />
+      </svg>
+    </span>
+  )
+}
+
 export default function App() {
   const rootRef = useRef(null)
   const skyRef = useRef(null)
   const artistRef = useRef(null)
   const celestialRef = useRef(null)
+  const audioRef = useRef(null)
+  const [playing, setPlaying] = useState(false)
+
+  const togglePlay = useCallback(async () => {
+    const audio = audioRef.current
+    if (!audio) return
+    try {
+      if (audio.paused) {
+        audio.currentTime = audio.currentTime || 0
+        const playPromise = audio.play()
+        if (playPromise !== undefined) await playPromise
+        setPlaying(true)
+      } else {
+        audio.pause()
+        setPlaying(false)
+      }
+    } catch (err) {
+      console.error('Audio play failed:', err)
+      setPlaying(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    const audio = audioRef.current
+    if (!audio) return
+    const onEnded = () => setPlaying(false)
+    const onPause = () => setPlaying(false)
+    const onPlay = () => setPlaying(true)
+    audio.addEventListener('ended', onEnded)
+    audio.addEventListener('pause', onPause)
+    audio.addEventListener('play', onPlay)
+    return () => {
+      audio.removeEventListener('ended', onEnded)
+      audio.removeEventListener('pause', onPause)
+      audio.removeEventListener('play', onPlay)
+    }
+  }, [])
 
   useEffect(() => {
     const root = rootRef.current
@@ -82,7 +143,7 @@ export default function App() {
         )
         .from(
           '[data-anim="cta"]',
-          { y: 22, opacity: 0, stagger: 0.12, duration: 0.7 },
+          { y: 22, opacity: 0, duration: 0.7 },
           '-=0.35',
         )
         .from(
@@ -201,7 +262,7 @@ export default function App() {
 
       {/* Stars — mid layer */}
       <div ref={celestialRef} className="pointer-events-none absolute inset-0 z-0 will-change-transform">
-        <CelestialEffects />
+        <CelestialEffects playing={playing} />
       </div>
 
       {/* Girl — near layer */}
@@ -220,8 +281,13 @@ export default function App() {
       >
         <a
           href="#top"
-          className="font-display text-[1.65rem] leading-none tracking-[0.02em] text-cream md:text-[1.85rem]"
+          className="flex items-center gap-2.5 font-display text-[1.65rem] leading-none tracking-[0.02em] text-cream md:text-[1.85rem]"
         >
+          <img
+            src="/img/logo.png"
+            alt=""
+            className="h-7 w-7 mix-blend-lighten md:h-8 md:w-8"
+          />
           Lubiana
         </a>
 
@@ -295,28 +361,35 @@ export default function App() {
           <span className="h-px flex-1 bg-gold/70" />
         </div>
 
-        <div className="mb-14 flex flex-wrap items-center gap-5 sm:gap-7">
-          <a
-            data-anim="cta"
-            href="#listen"
-            className="inline-flex items-center gap-2.5 rounded-full bg-gold-btn px-7 py-3 text-[11px] font-medium tracking-[0.22em] text-night-deep uppercase transition-transform hover:scale-[1.03]"
+        <div
+          data-anim="cta"
+          className="mb-14 flex items-center gap-5 sm:gap-7"
+        >
+          <button
+            type="button"
+            onClick={togglePlay}
+            className="flex h-10 shrink-0 cursor-pointer items-center justify-center gap-2.5 rounded-full bg-gold-btn px-7 text-[11px] leading-none font-medium tracking-[0.22em] text-night-deep uppercase transition-transform hover:scale-[1.03]"
           >
             Listen Now
             <StarIcon className="h-2.5 w-2.5" />
-          </a>
-          <a
-            data-anim="cta"
-            href="#video"
-            className="inline-flex items-center gap-3 text-[11px] font-light tracking-[0.28em] text-cream uppercase transition-colors hover:text-gold"
+          </button>
+          <button
+            type="button"
+            onClick={togglePlay}
+            aria-label={playing ? 'Pause sample' : 'Play sample'}
+            className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full border border-cream/70 text-cream transition-colors hover:border-gold hover:text-gold"
           >
-            <span className="flex h-9 w-9 items-center justify-center rounded-full border border-cream/70">
-              <svg className="ml-0.5 h-3 w-3" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
-                <path d="M3 1.5v9l8-4.5-8-4.5z" />
-              </svg>
-            </span>
+            <PlayPauseIcon playing={playing} />
+          </button>
+          <a
+            href="#video"
+            className="flex h-10 cursor-pointer items-center text-[11px] leading-none font-light tracking-[0.28em] text-cream uppercase transition-colors hover:text-gold"
+          >
             Watch Video
           </a>
         </div>
+
+        <audio ref={audioRef} src="/sample.mp3" preload="auto" />
 
         <div data-anim="tour" className="flex items-end gap-4 sm:gap-5">
           <div className="relative shrink-0">
@@ -325,7 +398,7 @@ export default function App() {
               aria-hidden="true"
             />
             <img
-              src={albumArt}
+              src="/img/cover.png"
               alt="Beloved album cover"
               className="relative h-[4.5rem] w-[4.5rem] object-cover shadow-[0_8px_24px_rgba(0,0,0,0.45)] sm:h-[5rem] sm:w-[5rem]"
             />
