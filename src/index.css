@@ -29,11 +29,6 @@
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
     background-color: var(--color-night-deep);
-    background-image: url("/img/sky.png");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
   }
 
   #root {

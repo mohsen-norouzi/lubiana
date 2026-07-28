@@ -51,9 +51,16 @@ function InstagramIcon() {
 
 export default function App() {
   const rootRef = useRef(null)
+  const skyRef = useRef(null)
   const artistRef = useRef(null)
+  const celestialRef = useRef(null)
 
   useEffect(() => {
+    const root = rootRef.current
+    if (!root) return
+
+    let removeParallax = () => {}
+
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
 
@@ -105,26 +112,105 @@ export default function App() {
         yoyo: true,
         ease: 'sine.inOut',
       })
+
+      // Soft damped parallax — subtle depth, no harsh jumps
+      const damp = { duration: 2.4, ease: 'power3.out' }
+      const dampNear = { duration: 2.0, ease: 'power3.out' }
+
+      const skyX = gsap.quickTo(skyRef.current, 'x', damp)
+      const skyY = gsap.quickTo(skyRef.current, 'y', damp)
+      const skyRX = gsap.quickTo(skyRef.current, 'rotateX', damp)
+      const skyRY = gsap.quickTo(skyRef.current, 'rotateY', damp)
+
+      const girlX = gsap.quickTo(artistRef.current, 'x', dampNear)
+      const girlY = gsap.quickTo(artistRef.current, 'y', dampNear)
+      const girlRX = gsap.quickTo(artistRef.current, 'rotateX', dampNear)
+      const girlRY = gsap.quickTo(artistRef.current, 'rotateY', dampNear)
+
+      const starsX = gsap.quickTo(celestialRef.current, 'x', { duration: 2.2, ease: 'power3.out' })
+      const starsY = gsap.quickTo(celestialRef.current, 'y', { duration: 2.2, ease: 'power3.out' })
+
+      gsap.set([skyRef.current, artistRef.current], {
+        transformPerspective: 1400,
+        force3D: true,
+      })
+      gsap.set(skyRef.current, { scale: 1.04 })
+      gsap.set(artistRef.current, { scale: 1.03 })
+
+      const onMove = (e) => {
+        const rect = root.getBoundingClientRect()
+        const nx = ((e.clientX - rect.left) / rect.width - 0.5) * 2
+        const ny = ((e.clientY - rect.top) / rect.height - 0.5) * 2
+
+        skyX(nx * -5)
+        skyY(ny * -3)
+        skyRX(ny * 0.6)
+        skyRY(nx * -0.8)
+
+        starsX(nx * -8)
+        starsY(ny * -5)
+
+        girlX(nx * 9)
+        girlY(ny * 6)
+        girlRX(ny * -1)
+        girlRY(nx * 1.2)
+      }
+
+      const onLeave = () => {
+        skyX(0)
+        skyY(0)
+        skyRX(0)
+        skyRY(0)
+        starsX(0)
+        starsY(0)
+        girlX(0)
+        girlY(0)
+        girlRX(0)
+        girlRY(0)
+      }
+
+      root.addEventListener('pointermove', onMove)
+      root.addEventListener('pointerleave', onLeave)
+      removeParallax = () => {
+        root.removeEventListener('pointermove', onMove)
+        root.removeEventListener('pointerleave', onLeave)
+      }
     }, rootRef)
 
-    return () => ctx.revert()
+    return () => {
+      removeParallax()
+      ctx.revert()
+    }
   }, [])
 
   return (
     <section
       ref={rootRef}
       className="relative min-h-svh w-full overflow-hidden bg-transparent text-cream"
+      style={{ perspective: 1200 }}
     >
-      {/* Stars behind */}
-      <CelestialEffects />
+      {/* Sky — far layer */}
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+        <img
+          ref={skyRef}
+          src="/img/sky.png"
+          alt=""
+          className="absolute inset-[-2%] h-[104%] w-[104%] max-w-none object-cover object-center will-change-transform"
+        />
+      </div>
 
-      {/* girl.png — normal <img>, untouched file. lighten = black sky lets stars show through */}
+      {/* Stars — mid layer */}
+      <div ref={celestialRef} className="pointer-events-none absolute inset-0 z-0 will-change-transform">
+        <CelestialEffects />
+      </div>
+
+      {/* Girl — near layer */}
       <div className="pointer-events-none absolute inset-0 z-[1] overflow-hidden">
         <img
           ref={artistRef}
           src="/img/girl.png"
           alt="Lubiana with kora"
-          className="absolute inset-0 h-full w-full object-cover object-center mix-blend-lighten"
+          className="absolute inset-[-1.5%] h-[103%] w-[103%] max-w-none object-cover object-center mix-blend-lighten will-change-transform"
         />
       </div>
 
