@@ -64,8 +64,8 @@ export default function App() {
           '-=0.35',
         )
         .from(
-          '[data-anim="title"] span',
-          { y: 70, opacity: 0, rotateX: 18, stagger: 0.05, duration: 0.85 },
+          '[data-anim="title"]',
+          { y: 40, opacity: 0, duration: 0.95 },
           '-=0.35',
         )
         .from(
@@ -183,16 +183,13 @@ export default function App() {
           <span className="text-[12px] font-light uppercase tracking-[0.32em]">New Album</span>
         </div>
 
-        <h1
-          data-anim="title"
-          className="font-display title-distress text-[clamp(4.2rem,11vw,7.5rem)] leading-[0.88] font-semibold tracking-[0.04em]"
-          style={{ perspective: 600 }}
-        >
-          {'BELOVED'.split('').map((letter, i) => (
-            <span key={i} className="inline-block">
-              {letter}
-            </span>
-          ))}
+        <h1 data-anim="title" className="m-0 w-full max-w-[min(100%,34rem)]">
+          <img
+            src="/img/beloved.png"
+            alt="Beloved"
+            className="block h-auto w-full select-none"
+            draggable={false}
+          />
         </h1>
 
         <div
