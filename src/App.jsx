@@ -1,122 +1,424 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useEffect, useRef } from 'react'
+import gsap from 'gsap'
+import heroScene from './assets/hero-composite.jpg'
+import albumArt from './assets/album-beloved.jpg'
 
-function App() {
-  const [count, setCount] = useState(0)
+const NAV = ['Music', 'Live', 'Videos', 'About', 'Journal', 'Contact']
 
+function StarIcon({ className = 'w-3 h-3' }) {
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M12 1.5l1.6 7.1L21 10l-7.4 1.4L12 22.5l-1.6-11.1L3 10l7.4-1.4L12 1.5z" />
+    </svg>
   )
 }
 
-export default App
+function EightPointStar({ className = 'w-3.5 h-3.5' }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M12 0l1.85 8.15L22 10l-8.15 1.85L12 20l-1.85-8.15L2 10l8.15-1.85L12 0z" />
+      <path
+        d="M12 4.5l.9 4.1L17.5 10l-4.6.9-.9 4.6-.9-4.6L7 10l4.1-.9.9-4.6z"
+        opacity="0.35"
+      />
+    </svg>
+  )
+}
+
+function SpotifyIcon() {
+  return (
+    <svg className="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.52 17.34c-.24.36-.66.48-1.02.24-2.82-1.74-6.36-2.1-10.56-1.14-.42.12-.78-.18-.9-.54-.12-.42.18-.78.54-.9 4.56-1.02 8.52-.6 11.64 1.32.3.18.42.66.3 1.02zm1.44-3.3c-.3.42-.84.6-1.26.3-3.24-1.98-8.16-2.58-11.94-1.38-.48.12-.99-.12-1.14-.6-.12-.48.12-.99.6-1.14 4.38-1.32 9.78-.66 13.5 1.62.42.24.54.84.24 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.3c-.6.18-1.2-.18-1.38-.72-.18-.6.18-1.2.72-1.38 4.26-1.26 11.28-1.02 15.72 1.62.54.3.72 1.02.42 1.56-.3.42-1.02.6-1.56.3z" />
+    </svg>
+  )
+}
+
+function YoutubeIcon() {
+  return (
+    <svg className="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.5 31.5 0 0 0 0 12a31.5 31.5 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.5 31.5 0 0 0 24 12a31.5 31.5 0 0 0-.5-5.8zM9.75 15.5v-7l6.5 3.5-6.5 3.5z" />
+    </svg>
+  )
+}
+
+function InstagramIcon() {
+  return (
+    <svg className="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M12 2.2c3.2 0 3.6 0 4.9.1 3.3.1 4.8 1.7 4.9 4.9.1 1.3.1 1.7.1 4.9s0 3.6-.1 4.9c-.1 3.2-1.7 4.8-4.9 4.9-1.3.1-1.7.1-4.9.1s-3.6 0-4.9-.1c-3.3-.1-4.8-1.7-4.9-4.9-.1-1.3-.1-1.7-.1-4.9s0-3.6.1-4.9c.1-3.2 1.7-4.8 4.9-4.9 1.3-.1 1.7-.1 4.9-.1zm0 1.8c-3.2 0-3.5 0-4.8.1-2.3.1-3.3 1.2-3.4 3.4-.1 1.2-.1 1.6-.1 4.8s0 3.5.1 4.8c.1 2.2 1.2 3.3 3.4 3.4 1.2.1 1.6.1 4.8.1s3.5 0 4.8-.1c2.2-.1 3.3-1.2 3.4-3.4.1-1.2.1-1.6.1-4.8s0-3.5-.1-4.8c-.1-2.2-1.2-3.3-3.4-3.4-1.3-.1-1.6-.1-4.8-.1zm0 3.1a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 8.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4zm6.4-8.4a1.2 1.2 0 1 1-2.4 0 1.2 1.2 0 0 1 2.4 0z" />
+    </svg>
+  )
+}
+
+function generateStars(count) {
+  return Array.from({ length: count }, (_, i) => ({
+    id: i,
+    left: `${(i * 37) % 100}%`,
+    top: `${(i * 53) % 62}%`,
+    size: i % 5 === 0 ? 2.5 : i % 3 === 0 ? 1.8 : 1.2,
+    delay: (i % 10) * 0.35,
+    duration: 1.8 + (i % 5) * 0.4,
+  }))
+}
+
+const STARS = generateStars(48)
+
+export default function App() {
+  const rootRef = useRef(null)
+  const sceneRef = useRef(null)
+  const orbitRef = useRef(null)
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
+
+      tl.from('[data-anim="nav"]', { y: -24, opacity: 0, duration: 0.9 })
+        .from(
+          '[data-anim="eyebrow"]',
+          { y: 18, opacity: 0, duration: 0.7 },
+          '-=0.35',
+        )
+        .from(
+          '[data-anim="title"] span',
+          { y: 70, opacity: 0, rotateX: 18, stagger: 0.05, duration: 0.85 },
+          '-=0.35',
+        )
+        .from(
+          '[data-anim="outnow"]',
+          { scaleX: 0.6, opacity: 0, duration: 0.7 },
+          '-=0.45',
+        )
+        .from(
+          '[data-anim="cta"]',
+          { y: 22, opacity: 0, stagger: 0.12, duration: 0.7 },
+          '-=0.35',
+        )
+        .from(
+          '[data-anim="tour"]',
+          { y: 28, opacity: 0, duration: 0.8 },
+          '-=0.35',
+        )
+        .from(
+          '[data-anim="copy"]',
+          { opacity: 0, duration: 0.6 },
+          '-=0.4',
+        )
+
+      gsap.fromTo(
+        sceneRef.current,
+        { scale: 1.08, xPercent: 2 },
+        {
+          scale: 1,
+          xPercent: 0,
+          duration: 4.5,
+          ease: 'power2.out',
+        },
+      )
+
+      // Subtle ongoing Ken Burns
+      gsap.to(sceneRef.current, {
+        scale: 1.05,
+        xPercent: -1.5,
+        duration: 28,
+        ease: 'none',
+        repeat: -1,
+        yoyo: true,
+        delay: 4.5,
+      })
+
+      // Twinkling stars
+      gsap.to('[data-star]', {
+        opacity: 0.15,
+        duration: 1.4,
+        stagger: {
+          each: 0.12,
+          from: 'random',
+          repeat: -1,
+          yoyo: true,
+        },
+        ease: 'sine.inOut',
+      })
+
+      // Orbit path draw
+      const path = orbitRef.current
+      if (path) {
+        const length = path.getTotalLength()
+        gsap.set(path, {
+          strokeDasharray: length,
+          strokeDashoffset: length,
+        })
+        gsap.to(path, {
+          strokeDashoffset: 0,
+          duration: 2.4,
+          ease: 'power2.inOut',
+          delay: 0.6,
+        })
+        gsap.from('[data-anim="sun"]', {
+          scale: 0,
+          opacity: 0,
+          duration: 0.8,
+          delay: 2.6,
+          ease: 'back.out(2)',
+        })
+      }
+
+      // Soft cloud drift via CSS filter layer
+      gsap.to('[data-anim="cloud-wash"]', {
+        xPercent: 4,
+        duration: 22,
+        ease: 'sine.inOut',
+        repeat: -1,
+        yoyo: true,
+      })
+
+      // Star icon pulse
+      gsap.to('[data-twinkle]', {
+        opacity: 0.35,
+        scale: 0.85,
+        duration: 1.6,
+        stagger: 0.3,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut',
+      })
+    }, rootRef)
+
+    return () => ctx.revert()
+  }, [])
+
+  return (
+    <section
+      ref={rootRef}
+      className="relative min-h-svh w-full overflow-hidden bg-night-deep text-cream"
+    >
+      {/* Background scene */}
+      <div className="pointer-events-none absolute inset-0">
+        <img
+          ref={sceneRef}
+          src={heroScene}
+          alt=""
+          className="absolute inset-0 h-full w-full origin-right object-cover object-[72%_center] will-change-transform"
+        />
+
+        {/* Left readability wash */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              'linear-gradient(90deg, #040d18e6 0%, #071525b3 32%, #07152555 48%, transparent 64%)',
+          }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              'linear-gradient(180deg, #040d18b3 0%, transparent 16%, transparent 82%, #040d18cc 100%)',
+          }}
+        />
+        <div
+          data-anim="cloud-wash"
+          className="absolute inset-y-[42%] left-0 w-[55%] opacity-40"
+          style={{
+            background:
+              'radial-gradient(ellipse at 30% 70%, rgba(210,200,185,0.22) 0%, transparent 55%)',
+          }}
+        />
+        {/* Film grain */}
+        <div className="text-grain absolute inset-0 opacity-[0.18] mix-blend-overlay" />
+      </div>
+
+      {/* Star field */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        {STARS.map((star) => (
+          <span
+            key={star.id}
+            data-star
+            className="absolute rounded-full bg-cream"
+            style={{
+              left: star.left,
+              top: star.top,
+              width: star.size,
+              height: star.size,
+              opacity: 0.55 + (star.id % 4) * 0.1,
+              boxShadow: star.size > 2 ? '0 0 6px rgba(232,226,216,0.55)' : 'none',
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Orbital arc */}
+      <svg
+        className="pointer-events-none absolute inset-0 h-full w-full"
+        viewBox="0 0 1440 900"
+        fill="none"
+        preserveAspectRatio="xMidYMid slice"
+        aria-hidden="true"
+      >
+        <path
+          ref={orbitRef}
+          d="M780 420 C 980 180, 1180 140, 1360 220"
+          stroke="rgba(232,226,216,0.55)"
+          strokeWidth="1.2"
+          strokeDasharray="3 7"
+        />
+        <g data-anim="sun" transform="translate(1352, 214)">
+          <circle r="4" fill="#d4a86a" />
+          <path
+            d="M0 -11 L1.4 -3.2 L9 -3.2 L2.8 1.2 L5.2 8.5 L0 4 L-5.2 8.5 L-2.8 1.2 L-9 -3.2 L-1.4 -3.2 Z"
+            fill="#d4a86a"
+            opacity="0.9"
+          />
+        </g>
+      </svg>
+
+      {/* Header */}
+      <header
+        data-anim="nav"
+        className="relative z-20 flex items-center justify-between px-6 pt-6 md:px-10 lg:px-14 lg:pt-8"
+      >
+        <a
+          href="#top"
+          className="font-display text-[1.65rem] leading-none tracking-[0.02em] text-cream md:text-[1.85rem]"
+        >
+          Lubiana
+        </a>
+
+        <nav className="hidden items-center gap-7 lg:flex xl:gap-9">
+          {NAV.map((item) => (
+            <a
+              key={item}
+              href={`#${item.toLowerCase()}`}
+              className="text-[11px] font-light uppercase tracking-[0.28em] text-cream/90 transition-colors hover:text-gold"
+            >
+              {item}
+            </a>
+          ))}
+        </nav>
+
+        <div className="flex items-center gap-4 text-cream/90">
+          <a href="https://spotify.com" aria-label="Spotify" className="transition-colors hover:text-gold">
+            <SpotifyIcon />
+          </a>
+          <a href="https://youtube.com" aria-label="YouTube" className="transition-colors hover:text-gold">
+            <YoutubeIcon />
+          </a>
+          <a href="https://instagram.com" aria-label="Instagram" className="transition-colors hover:text-gold">
+            <InstagramIcon />
+          </a>
+          <button
+            type="button"
+            className="ml-1 flex h-9 w-9 items-center justify-center rounded-full border border-cream/25 lg:hidden"
+            aria-label="Open menu"
+          >
+            <span className="flex flex-col gap-[3px]">
+              <span className="block h-px w-3.5 bg-cream" />
+              <span className="block h-px w-3.5 bg-cream" />
+              <span className="block h-px w-3.5 bg-cream" />
+            </span>
+          </button>
+        </div>
+      </header>
+
+      {/* Hero content */}
+      <div className="relative z-20 flex min-h-[calc(100svh-5.5rem)] flex-col justify-center px-6 pb-24 pt-10 md:px-10 lg:max-w-[52%] lg:px-14 lg:pb-28 lg:pt-6 xl:max-w-[48%]">
+        <div data-anim="eyebrow" className="mb-4 flex items-center gap-2.5 text-gold">
+          <span data-twinkle>
+            <EightPointStar className="h-3.5 w-3.5" />
+          </span>
+          <span className="text-[12px] font-light uppercase tracking-[0.32em]">New Album</span>
+        </div>
+
+        <h1
+          data-anim="title"
+          className="font-display title-distress text-[clamp(4.2rem,11vw,7.5rem)] leading-[0.88] font-semibold tracking-[0.04em]"
+          style={{ perspective: 600 }}
+        >
+          {'BELOVED'.split('').map((letter, i) => (
+            <span key={i} className="inline-block">
+              {letter}
+            </span>
+          ))}
+        </h1>
+
+        <div
+          data-anim="outnow"
+          className="mt-5 mb-8 flex max-w-[16rem] items-center gap-3 origin-left"
+        >
+          <span className="h-px flex-1 bg-gold/70" />
+          <span data-twinkle className="text-gold">
+            <StarIcon className="h-2.5 w-2.5" />
+          </span>
+          <span className="text-[12px] font-light uppercase tracking-[0.35em] text-gold">
+            Out Now
+          </span>
+          <span data-twinkle className="text-gold">
+            <StarIcon className="h-2.5 w-2.5" />
+          </span>
+          <span className="h-px flex-1 bg-gold/70" />
+        </div>
+
+        <div className="mb-14 flex flex-wrap items-center gap-5 sm:gap-7">
+          <a
+            data-anim="cta"
+            href="#listen"
+            className="inline-flex items-center gap-2.5 rounded-full bg-gold-btn px-7 py-3 text-[11px] font-medium tracking-[0.22em] text-night-deep uppercase transition-transform hover:scale-[1.03]"
+          >
+            Listen Now
+            <StarIcon className="h-2.5 w-2.5" />
+          </a>
+          <a
+            data-anim="cta"
+            href="#video"
+            className="inline-flex items-center gap-3 text-[11px] font-light tracking-[0.28em] text-cream uppercase transition-colors hover:text-gold"
+          >
+            <span className="flex h-9 w-9 items-center justify-center rounded-full border border-cream/70">
+              <svg className="ml-0.5 h-3 w-3" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
+                <path d="M3 1.5v9l8-4.5-8-4.5z" />
+              </svg>
+            </span>
+            Watch Video
+          </a>
+        </div>
+
+        {/* Tour strip */}
+        <div data-anim="tour" className="flex items-end gap-4 sm:gap-5">
+          <div className="relative shrink-0">
+            <div
+              className="absolute -right-2 -top-1 h-[4.5rem] w-[4.5rem] rounded-full border border-cream/15 bg-gradient-to-br from-[#2a3340] to-[#121820] sm:h-[5rem] sm:w-[5rem]"
+              aria-hidden="true"
+            />
+            <img
+              src={albumArt}
+              alt="Beloved album cover"
+              className="relative h-[4.5rem] w-[4.5rem] object-cover shadow-[0_8px_24px_rgba(0,0,0,0.45)] sm:h-[5rem] sm:w-[5rem]"
+            />
+          </div>
+          <div className="pb-0.5">
+            <div className="mb-1.5 flex items-center gap-2 text-gold">
+              <span data-twinkle>
+                <StarIcon className="h-2.5 w-2.5" />
+              </span>
+              <p className="text-[12px] font-light tracking-[0.04em]">
+                European Tour 26{' '}
+                <span className="text-gold/50">/</span>{' '}
+                <span className="text-gold-soft">Tickets on sale now</span>
+              </p>
+            </div>
+            <a
+              href="#tour"
+              className="text-[11px] font-light tracking-[0.28em] text-cream/90 uppercase underline decoration-cream/40 underline-offset-4 transition-colors hover:text-gold hover:decoration-gold"
+            >
+              See Dates
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <p
+        data-anim="copy"
+        className="absolute bottom-5 left-6 z-20 text-[10px] tracking-[0.06em] text-cream/45 md:left-10 lg:left-14"
+      >
+        © 2026 Lubiana. All rights reserved.
+      </p>
+    </section>
+  )
+}
